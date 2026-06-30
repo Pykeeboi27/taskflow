@@ -1,0 +1,31 @@
+services:
+
+  frontend:
+    build:
+      context: ./taskflow-frontend
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+
+    volumes:
+      - ./taskflow-frontend:/app
+      - /app/node_modules
+
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./taskflow-backend
+
+    ports:
+      - "8000:8000"
+
+    env_file:
+      - ./taskflow-backend/.env
+
+    volumes:
+      - ./taskflow-backend:/app
