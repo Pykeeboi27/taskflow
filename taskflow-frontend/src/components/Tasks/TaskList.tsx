@@ -1,127 +1,105 @@
 "use client";
 
-import TaskFilters from "@/components/Tasks/TaskFilters";
-import TaskForm from "@/components/Tasks/TaskForm";
+import { useState } from "react";
+import { ChevronLeft, ChevronRight, ClipboardList, Plus } from "lucide-react";
 import TaskItem from "@/components/Tasks/TaskItem";
+import TaskForm from "@/components/Tasks/TaskForm";
+import Sheet from "@/components/Common/Sheet";
 import Button from "@/components/Common/Button";
-import Spinner, { PageLoader } from "@/components/Common/Loading";
-import { useTasks } from "@/hooks/useTasks";
-import type { Task } from "@/types";
+import { SkeletonCard } from "@/components/Common/Loading";
+import { useTaskContext } from "@/context/TaskContext";
 
-type TaskListProps = {
-  onTaskCreated?: (task: Task) => void;
-};
+export default function TaskList() {
+  const { tasks, total, page, pages, isLoading, error, setPage } = useTaskContext();
+  const [sheetOpen, setSheetOpen] = useState(false);
 
-export default function TaskList({ onTaskCreated }: TaskListProps) {
-  const {
-    tasks,
-    total,
-    page,
-    limit,
-    pages,
-    isLoading,
-    error,
-    statusFilter,
-    fetchTasks,
-    setPage,
-    setLimit,
-    setStatusFilter,
-    updateTask,
-    deleteTask,
-  } = useTasks();
-
-  const handleTaskCreated = (task: Task) => {
-    onTaskCreated?.(task);
-    void fetchTasks();
-  };
-
-  const startItem = total === 0 ? 0 : (page - 1) * limit + 1;
-  const endItem = total === 0 ? 0 : Math.min(page * limit, total);
   const totalPages = pages > 0 ? pages : 1;
 
   return (
-    <div className="space-y-6">
-      <TaskForm onTaskCreated={handleTaskCreated} />
-
-      <div className="hidden">
-        <PageLoader />
+    <>
+      {/* Section header */}
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h1 className="text-lg font-bold text-ink tracking-tight">Tasks</h1>
+          <p className="text-xs text-ink-muted mt-0.5">{total} total</p>
+        </div>
+        <Button onClick={() => setSheetOpen(true)} className="gap-1.5">
+          <Plus size={14} aria-hidden="true" />
+          New Task
+        </Button>
       </div>
 
-      <TaskFilters activeFilter={statusFilter} onFilterChange={setStatusFilter} />
+      {/* Error */}
+      {error ? (
+        <div
+          role="alert"
+          className="rounded-lg border border-danger/20 bg-danger-tint px-4 py-3 text-sm text-danger mb-4"
+        >
+          {error}
+        </div>
+      ) : null}
 
+      {/* Task list */}
       {isLoading ? (
-        <div className="flex justify-center py-12">
-          <Spinner />
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      ) : tasks.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 sm:py-20 gap-4">
+          <ClipboardList size={40} className="text-ink-muted" aria-hidden="true" />
+          <div className="text-center">
+            <p className="text-sm font-medium text-ink">No tasks yet</p>
+            <p className="text-xs text-ink-dim mt-1">Create your first task to get started.</p>
+          </div>
+          <Button variant="secondary" onClick={() => setSheetOpen(true)}>
+            <Plus size={13} aria-hidden="true" />
+            New Task
+          </Button>
         </div>
       ) : (
         <>
-          {error ? (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {error}
-            </div>
-          ) : null}
+          <div className="flex flex-col gap-2">
+            {tasks.map((task) => (
+              <TaskItem key={task.id} task={task} />
+            ))}
+          </div>
 
-          {tasks.length === 0 ? (
-            <div className="py-16 text-center text-gray-500">
-              No tasks yet. Create your first task above!
-            </div>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {tasks.map((task) => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onUpdate={updateTask}
-                  onDelete={deleteTask}
-                />
-              ))}
-            </div>
-          )}
-
-          <div className="flex flex-col gap-4 border-t border-gray-100 pt-4 lg:flex-row lg:items-center lg:justify-between">
-            <p className="text-sm text-gray-500">
-              Showing {startItem}–{endItem} of {total} tasks
-            </p>
-
-            <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-gray-500">
+          {/* Pagination */}
+          {totalPages > 1 ? (
+            <div className="flex items-center justify-center gap-4 border-t border-line pt-4 mt-4">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setPage(page - 1)}
                 disabled={page <= 1}
+                aria-label="Previous page"
               >
+                <ChevronLeft size={14} aria-hidden="true" />
                 Previous
               </Button>
-
-              <span>
-                Page {page} of {totalPages}
+              <span className="text-sm text-ink-muted tabular-nums">
+                {page} / {totalPages}
               </span>
-
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setPage(page + 1)}
                 disabled={page >= totalPages}
+                aria-label="Next page"
               >
                 Next
+                <ChevronRight size={14} aria-hidden="true" />
               </Button>
             </div>
-
-            <label className="flex items-center gap-2 text-sm text-gray-500">
-              <span>Per page</span>
-              <select
-                value={limit}
-                onChange={(event) => setLimit(Number(event.target.value))}
-                className="rounded-lg border border-gray-300 px-2 py-1 text-sm text-gray-900"
-              >
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-              </select>
-            </label>
-          </div>
+          ) : null}
         </>
       )}
-    </div>
+
+      <Sheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="New Task">
+        <TaskForm onSuccess={() => setSheetOpen(false)} />
+      </Sheet>
+    </>
   );
 }

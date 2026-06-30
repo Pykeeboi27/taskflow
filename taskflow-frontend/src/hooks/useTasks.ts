@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import * as api from "@/lib/api";
 import type { ApiError, Task, TaskListResponse, TaskStatus, UpdateTaskPayload } from "@/types";
@@ -73,7 +73,14 @@ export function useTasks(initialPage = 1, initialLimit = 10): UseTasksResult {
     [limit, page, statusFilter],
   );
 
+  // Guard to run only once on mount. Without this, every page/filter change
+  // rebuilds fetchTasks (its useCallback deps include page/statusFilter),
+  // which causes the effect to re-fire and snap pagination back to page 1.
+  const didInit = useRef(false);
+
   useEffect(() => {
+    if (didInit.current) return;
+    didInit.current = true;
     void fetchTasks(initialPage, initialLimit, undefined);
   }, [fetchTasks, initialLimit, initialPage]);
 

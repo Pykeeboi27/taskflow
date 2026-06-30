@@ -7,7 +7,7 @@ import type {
 	UpdateTaskPayload,
 } from "@/types";
 
-export const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+export const BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000") + "/api/v1";
 
 const AUTH_TOKEN_KEY = "auth_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
@@ -56,7 +56,9 @@ function redirectToLogin() {
 }
 
 function buildUrl(endpoint: string, query?: Record<string, string | number | undefined>) {
-	const url = new URL(endpoint, BASE_URL);
+	const base = BASE_URL.endsWith("/") ? BASE_URL.slice(0, -1) : BASE_URL;
+	const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+	const url = new URL(`${base}${path}`);
 
 	if (query) {
 		for (const [key, value] of Object.entries(query)) {
@@ -71,12 +73,23 @@ function buildUrl(endpoint: string, query?: Record<string, string | number | und
 
 async function parseErrorResponse(response: Response): Promise<ApiErrorResponse> {
 	try {
-		const payload = (await response.json()) as Partial<ApiErrorResponse>;
+		const body = (await response.json()) as Record<string, unknown>;
+		// FastAPI wraps error details under a "detail" key.
+		// Guard against detail being a plain string (e.g. generic 401 from auth middleware).
+		const detail =
+			body &&
+			typeof body.detail === "object" &&
+			body.detail !== null
+				? (body.detail as Record<string, unknown>)
+				: body;
 
 		return {
-			error: payload.error ?? "Request failed",
-			message: payload.message ?? response.statusText ?? "Request failed",
-			field: payload.field,
+			error: typeof detail?.error === "string" ? detail.error : "Request failed",
+			message:
+				typeof detail?.message === "string"
+					? detail.message
+					: (response.statusText ?? "Request failed"),
+			field: typeof detail?.field === "string" ? detail.field : undefined,
 		};
 	} catch {
 		return {

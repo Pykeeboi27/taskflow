@@ -2,7 +2,7 @@
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,9 +12,13 @@ from app.auth import (
     decode_token,
     get_current_user,
     hash_password,
+    is_token_revoked,
+    oauth2_scheme,
+    revoke_token,
     verify_password,
 )
 from app.database import get_db
+from app.limiter import limiter
 from app.models import User
 from app.schemas import (
     LoginRequest,
@@ -40,7 +44,8 @@ def _token_payload(user: User) -> dict:
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-async def register(payload: RegisterRequest, db: AsyncSession = Depends(get_db)) -> TokenResponse:
+@limiter.limit("5/minute")
+async def register(request: Request, payload: RegisterRequest, db: AsyncSession = Depends(get_db)) -> TokenResponse:
     result = await db.execute(select(User).where(User.email == payload.email))
     existing_user = result.scalar_one_or_none()
 
@@ -67,7 +72,8 @@ async def register(payload: RegisterRequest, db: AsyncSession = Depends(get_db))
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)) -> TokenResponse:
+@limiter.limit("5/minute")
+async def login(request: Request, payload: LoginRequest, db: AsyncSession = Depends(get_db)) -> TokenResponse:
     result = await db.execute(select(User).where(User.email == payload.email))
     user = result.scalar_one_or_none()
 
@@ -138,6 +144,17 @@ async def refresh(payload: RefreshRequest, db: AsyncSession = Depends(get_db)) -
 
 
 @router.post("/logout")
-async def logout(current_user: User = Depends(get_current_user)) -> dict[str, str]:
+async def logout(
+    token: str = Depends(oauth2_scheme),
+    current_user: User = Depends(get_current_user),
+) -> dict[str, str]:
     _ = current_user
+    try:
+        payload = decode_token(token)
+        jti = payload.get("jti")
+        if jti:
+            revoke_token(str(jti))
+    except Exception:
+        # If decode fails for any reason, the client-side logout still proceeds.
+        pass
     return {"message": "Logout successful"}

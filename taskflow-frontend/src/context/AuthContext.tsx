@@ -57,6 +57,12 @@ function userFromToken(token: string): User | null {
 		return null;
 	}
 
+	// Reject expired tokens immediately on load rather than waiting for the
+	// first API call to 401, which would briefly show an authenticated UI.
+	if (typeof payload.exp === "number" && payload.exp * 1000 < Date.now()) {
+		return null;
+	}
+
 	const userId = typeof payload.user_id === "string" ? payload.user_id : null;
 	const email = typeof payload.email === "string" ? payload.email : null;
 
@@ -83,7 +89,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		const token = window.localStorage.getItem(AUTH_TOKEN_KEY);
 
 		if (token) {
-			setUser(userFromToken(token));
+			const user = userFromToken(token);
+			if (user) {
+				setUser(user);
+			} else {
+				// Token is invalid or expired — remove it so it doesn't persist.
+				window.localStorage.removeItem(AUTH_TOKEN_KEY);
+			}
 		}
 
 		setIsLoading(false);

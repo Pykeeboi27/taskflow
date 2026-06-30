@@ -1,26 +1,86 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ── Design tokens: emitted as :root CSS vars + Tailwind utilities ── */
+@theme {
+  /* Brand — "Ink" violet */
+  --color-brand:       #5B5BD6;
+  --color-brand-hover: #4747C2;
+  --color-brand-soft:  #EDEDFB;
+  --color-brand-fg:    #3E3E9E;
+
+  /* Canvas (surfaces) */
+  --color-canvas:        #FAFAF9;
+  --color-canvas-raised: #FFFFFF;
+  --color-canvas-input:  #F4F4F2;
+
+  /* Lines (borders) */
+  --color-line:        #E8E8E4;
+  --color-line-strong: #C8C8C2;
+
+  /* Ink (text) */
+  --color-ink:        #1A1A18;
+  --color-ink-dim:    #6B6B63;
+  --color-ink-muted:  #9B9B92;
+
+  /* Semantic */
+  --color-danger:      #D93026;
+  --color-danger-tint: #FEF0EE;
+  --color-success:     #18794E;
+  --color-success-tint:#EFFAF4;
+  --color-warn:        #B45309;
+  --color-warn-tint:   #FEF3C7;
+
+  /* Shadows */
+  --shadow-card:   0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-raised: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-modal:  0 16px 40px rgba(0,0,0,0.12);
 }
 
+/* ── Fonts: reference Next.js CSS vars (must stay inline) ── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Class-based dark mode — add .dark to <html> */
+@variant dark (&:where(.dark, .dark *));
+
+/* Dark mode token overrides */
+.dark {
+  --color-brand:        #6E6EDB;
+  --color-brand-hover:  #7E7EE4;
+  --color-brand-soft:   #1E1E3A;
+  --color-brand-fg:     #A0A0E8;
+
+  --color-canvas:        #111110;
+  --color-canvas-raised: #1C1C1A;
+  --color-canvas-input:  #252523;
+
+  --color-line:        #2E2E2C;
+  --color-line-strong: #424240;
+
+  --color-ink:        #EDEDEC;
+  --color-ink-dim:    #9B9B92;
+  --color-ink-muted:  #6B6B63;
+
+  --color-danger:      #E5534B;
+  --color-danger-tint: #1F0F0F;
+  --color-success:     #30A46C;
+  --color-success-tint:#0D1F14;
+  --color-warn:        #F5A623;
+  --color-warn-tint:   #1F1506;
+
+  --shadow-card:   0 1px 3px rgba(0,0,0,0.3),  0 1px 2px rgba(0,0,0,0.2);
+  --shadow-raised: 0 4px 12px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2);
+  --shadow-modal:  0 16px 40px rgba(0,0,0,0.6);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+/* Native dialog backdrop */
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
 }

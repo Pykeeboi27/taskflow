@@ -1,10 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import Button from "@/components/Common/Button";
-import Card from "@/components/Common/Card";
 import Input from "@/components/Common/Input";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -12,8 +12,7 @@ function getErrorMessage(error: unknown) {
   if (error && typeof error === "object" && "message" in error) {
     return String(error.message);
   }
-
-  return "Login failed";
+  return "Check your email and password and try again.";
 }
 
 export default function LoginForm() {
@@ -21,71 +20,91 @@ export default function LoginForm() {
   const auth = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | undefined>();
+  const [passwordError, setPasswordError] = useState<string | undefined>();
+  const [formError, setFormError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError(null);
+    setEmailError(undefined);
+    setPasswordError(undefined);
+    setFormError(null);
 
-    if (!email.trim() || !password.trim()) {
-      setError("Email and password are required.");
-      return;
+    let hasError = false;
+    if (!email.trim()) {
+      setEmailError("Email is required.");
+      hasError = true;
     }
+    if (!password.trim()) {
+      setPasswordError("Password is required.");
+      hasError = true;
+    }
+    if (hasError) return;
 
     setIsLoading(true);
-
     try {
       await auth.login(email, password);
       router.push("/dashboard");
     } catch (caughtError) {
-      setError(getErrorMessage(caughtError));
+      setFormError(getErrorMessage(caughtError));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Card className="max-w-md mx-auto mt-16">
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
-          <p className="text-gray-500 text-sm">Sign in to your account</p>
-        </div>
-
-        {error ? (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
-            {error}
-          </div>
-        ) : null}
-
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <Input
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="you@example.com"
-          />
-          <Input
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="••••••••"
-          />
-          <Button type="submit" className="w-full" isLoading={isLoading}>
-            Sign in
-          </Button>
-        </form>
-
-        <p className="text-sm text-gray-500">
-          Don't have an account?{" "}
-          <a href="/auth/register" className="text-blue-600">
-            Register
-          </a>
-        </p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-ink tracking-tight">Sign in</h1>
+        <p className="text-sm text-ink-dim mt-1">Welcome back. Let&apos;s get to work.</p>
       </div>
-    </Card>
+
+      {formError ? (
+        <div
+          role="alert"
+          className="bg-danger-tint border border-danger/20 text-danger text-sm rounded-lg px-4 py-3"
+        >
+          {formError}
+        </div>
+      ) : null}
+
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <Input
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setEmailError(undefined);
+          }}
+          placeholder="you@example.com"
+          error={emailError}
+          autoComplete="email"
+        />
+        <Input
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setPasswordError(undefined);
+          }}
+          placeholder="••••••••"
+          error={passwordError}
+          autoComplete="current-password"
+        />
+        <Button type="submit" className="w-full" isLoading={isLoading}>
+          Sign in
+        </Button>
+      </form>
+
+      <p className="text-sm text-ink-dim">
+        No account?{" "}
+        <Link href="/auth/register" className="text-brand font-medium hover:underline">
+          Create one
+        </Link>
+      </p>
+    </div>
   );
 }
