@@ -22,27 +22,37 @@ jobs:
 
   # ─── Stage 2: Security Scan ───────────────────────────────────────────────────
 
-  trivy:
-    name: Security Scan (Trivy)
-    needs: [gitleaks]
+  trivy-scan:
     runs-on: ubuntu-latest
+    needs: gitleaks
     steps:
-      - uses: actions/checkout@v4
-      - name: Run Trivy filesystem scan
-        uses: aquasecurity/trivy-action@0.28.0
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
-          scan-type: fs
-          scan-ref: .
-          severity: HIGH,CRITICAL
-          exit-code: 1
-          scanners: vuln,misconfig
-          skip-dirs: taskflow-frontend/.next
+          # Scan the entire repository (filesystem scan)
+          scan-type: 'fs'
+          scan-ref: '.'
+          # Exit with error code if vulnerabilities are found
+          exit-code: '1'
+          # Only fail on HIGH and CRITICAL vulnerabilities (ignore LOW/MEDIUM)
+          severity: 'HIGH,CRITICAL'
+          # Output format (you can also use json, sarif, table, etc.)
+          format: 'table'
+
+      # - name: Upload Trivy results to GitHub Security
+      #   uses: github/codeql-action/upload-sarif@v2
+      #   if: always()  # Run even if Trivy scan fails
+      #   with:
+      #     sarif_file: 'trivy-results.sarif'
 
   # ─── Stage 3: Lint + Format + Test (parallel) ─────────────────────────────────
 
   backend-ci:
     name: Backend CI
-    needs: [trivy]
+    needs: [trivy-scan]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -75,7 +85,7 @@ jobs:
 
   frontend-ci:
     name: Frontend CI
-    needs: [trivy]
+    needs: [trivy-scan]
     runs-on: ubuntu-latest
     defaults:
       run:
