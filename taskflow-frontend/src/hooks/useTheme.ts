@@ -10,11 +10,13 @@ export function useTheme() {
   }, []);
 
   const toggle = useCallback(() => {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("tf-theme", next ? "dark" : "light");
-  }, [isDark]);
+    setIsDark((prev) => {
+      const next = !prev;
+      document.documentElement.classList.toggle("dark", next);
+      localStorage.setItem("tf-theme", next ? "dark" : "light");
+      return next;
+    });
+  }, []);
 
   return { isDark, toggle };
 }

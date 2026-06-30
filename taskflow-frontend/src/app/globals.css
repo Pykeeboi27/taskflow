@@ -45,34 +45,36 @@
 /* Class-based dark mode — add .dark to <html> */
 @variant dark (&:where(.dark, .dark *));
 
-/* Dark mode token overrides */
-.dark {
-  --color-brand:        #6E6EDB;
-  --color-brand-hover:  #7E7EE4;
-  --color-brand-soft:   #1E1E3A;
-  --color-brand-fg:     #A0A0E8;
+/* Dark mode token overrides — must be in @layer base so Tailwind doesn't strip them */
+@layer base {
+  .dark {
+    --color-brand:        #6E6EDB;
+    --color-brand-hover:  #7E7EE4;
+    --color-brand-soft:   #1E1E3A;
+    --color-brand-fg:     #A0A0E8;
 
-  --color-canvas:        #111110;
-  --color-canvas-raised: #1C1C1A;
-  --color-canvas-input:  #252523;
+    --color-canvas:        #111110;
+    --color-canvas-raised: #1C1C1A;
+    --color-canvas-input:  #252523;
 
-  --color-line:        #2E2E2C;
-  --color-line-strong: #424240;
+    --color-line:        #2E2E2C;
+    --color-line-strong: #424240;
 
-  --color-ink:        #EDEDEC;
-  --color-ink-dim:    #9B9B92;
-  --color-ink-muted:  #6B6B63;
+    --color-ink:        #EDEDEC;
+    --color-ink-dim:    #9B9B92;
+    --color-ink-muted:  #6B6B63;
 
-  --color-danger:      #E5534B;
-  --color-danger-tint: #1F0F0F;
-  --color-success:     #30A46C;
-  --color-success-tint:#0D1F14;
-  --color-warn:        #F5A623;
-  --color-warn-tint:   #1F1506;
+    --color-danger:      #E5534B;
+    --color-danger-tint: #1F0F0F;
+    --color-success:     #30A46C;
+    --color-success-tint:#0D1F14;
+    --color-warn:        #F5A623;
+    --color-warn-tint:   #1F1506;
 
-  --shadow-card:   0 1px 3px rgba(0,0,0,0.3),  0 1px 2px rgba(0,0,0,0.2);
-  --shadow-raised: 0 4px 12px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2);
-  --shadow-modal:  0 16px 40px rgba(0,0,0,0.6);
+    --shadow-card:   0 1px 3px rgba(0,0,0,0.3),  0 1px 2px rgba(0,0,0,0.2);
+    --shadow-raised: 0 4px 12px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2);
+    --shadow-modal:  0 16px 40px rgba(0,0,0,0.6);
+  }
 }
 
 body {
