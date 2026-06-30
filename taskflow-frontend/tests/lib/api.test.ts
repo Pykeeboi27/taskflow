@@ -1,5 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { BASE_URL, apiRequest, getTasks, login, logout, register } from "@/lib/api";
+import {
+  BASE_URL,
+  apiRequest,
+  getTasks,
+  login,
+  logout,
+  register,
+} from "@/lib/api";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -23,7 +30,14 @@ function emptyRes(status: number, statusText = "") {
 const TASK_LIST = { items: [], total: 0, page: 1, limit: 20, pages: 0 };
 
 /** Minimal AuthResponse shape. */
-function authRes(overrides: Partial<{ access_token: string; refresh_token: string; user_id: string; email: string }> = {}) {
+function authRes(
+  overrides: Partial<{
+    access_token: string;
+    refresh_token: string;
+    user_id: string;
+    email: string;
+  }> = {},
+) {
   return {
     access_token: "at",
     refresh_token: "rt",
@@ -129,26 +143,38 @@ describe("src/lib/api.ts", () => {
 
     it("omits Authorization when no token is stored", async () => {
       await apiRequest("GET", "/tasks");
-      const headers = mockFetch.mock.calls[0][1].headers as Record<string, string>;
+      const headers = mockFetch.mock.calls[0][1].headers as Record<
+        string,
+        string
+      >;
       expect(headers).not.toHaveProperty("Authorization");
     });
 
     it("sends Authorization: Bearer <token> when a token is stored", async () => {
       localStorage.setItem("auth_token", "my_jwt");
       await apiRequest("GET", "/tasks");
-      const headers = mockFetch.mock.calls[0][1].headers as Record<string, string>;
+      const headers = mockFetch.mock.calls[0][1].headers as Record<
+        string,
+        string
+      >;
       expect(headers["Authorization"]).toBe("Bearer my_jwt");
     });
 
     it("omits Content-Type when no body is provided", async () => {
       await apiRequest("GET", "/tasks");
-      const headers = mockFetch.mock.calls[0][1].headers as Record<string, string>;
+      const headers = mockFetch.mock.calls[0][1].headers as Record<
+        string,
+        string
+      >;
       expect(headers).not.toHaveProperty("Content-Type");
     });
 
     it("sets Content-Type: application/json when a body is provided", async () => {
       await apiRequest("POST", "/tasks", { title: "My task" });
-      const headers = mockFetch.mock.calls[0][1].headers as Record<string, string>;
+      const headers = mockFetch.mock.calls[0][1].headers as Record<
+        string,
+        string
+      >;
       expect(headers["Content-Type"]).toBe("application/json");
     });
   });
@@ -173,7 +199,13 @@ describe("src/lib/api.ts", () => {
     it("unwraps FastAPI detail object → { error, message, field }", async () => {
       mockFetch.mockResolvedValue(
         jsonRes(
-          { detail: { error: "ValidationError", message: "Invalid input", field: "email" } },
+          {
+            detail: {
+              error: "ValidationError",
+              message: "Invalid input",
+              field: "email",
+            },
+          },
           422,
           "Unprocessable Entity",
         ),
@@ -188,13 +220,20 @@ describe("src/lib/api.ts", () => {
     it("falls back to body-level fields when detail is a string", async () => {
       mockFetch.mockResolvedValue(
         jsonRes(
-          { detail: "Unauthorized", error: "AuthError", message: "Not authenticated" },
+          {
+            detail: "Unauthorized",
+            error: "AuthError",
+            message: "Not authenticated",
+          },
           403,
           "Forbidden",
         ),
       );
       await expect(apiRequest("GET", "/profile")).rejects.toEqual(
-        expect.objectContaining({ error: "AuthError", message: "Not authenticated" }),
+        expect.objectContaining({
+          error: "AuthError",
+          message: "Not authenticated",
+        }),
       );
     });
 
@@ -210,7 +249,10 @@ describe("src/lib/api.ts", () => {
 
     it("falls back to statusText when response is not valid JSON", async () => {
       mockFetch.mockResolvedValue(
-        new Response("not-json", { status: 500, statusText: "Internal Server Error" }),
+        new Response("not-json", {
+          status: 500,
+          statusText: "Internal Server Error",
+        }),
       );
       await expect(apiRequest("GET", "/profile")).rejects.toMatchObject({
         error: "Request failed",
@@ -271,7 +313,11 @@ describe("src/lib/api.ts", () => {
       mockFetch
         .mockResolvedValueOnce(emptyRes(401))
         .mockResolvedValueOnce(
-          jsonRes({ detail: { error: "Unauthorized", message: "Refresh expired" } }, 401, "Unauthorized"),
+          jsonRes(
+            { detail: { error: "Unauthorized", message: "Refresh expired" } },
+            401,
+            "Unauthorized",
+          ),
         );
 
       await expect(apiRequest("GET", "/tasks")).rejects.toBeDefined();
@@ -287,7 +333,10 @@ describe("src/lib/api.ts", () => {
   describe("login", () => {
     it("persists access_token and refresh_token to localStorage on success", async () => {
       mockFetch.mockResolvedValue(
-        jsonRes(authRes({ access_token: "login_at", refresh_token: "login_rt" }), 200),
+        jsonRes(
+          authRes({ access_token: "login_at", refresh_token: "login_rt" }),
+          200,
+        ),
       );
 
       await login("test@example.com", "password");
@@ -313,7 +362,10 @@ describe("src/lib/api.ts", () => {
   describe("register", () => {
     it("persists access_token and refresh_token to localStorage on success", async () => {
       mockFetch.mockResolvedValue(
-        jsonRes(authRes({ access_token: "reg_at", refresh_token: "reg_rt" }), 201),
+        jsonRes(
+          authRes({ access_token: "reg_at", refresh_token: "reg_rt" }),
+          201,
+        ),
       );
 
       await register("new@example.com", "password123");
@@ -343,7 +395,11 @@ describe("src/lib/api.ts", () => {
       localStorage.setItem("auth_token", "at");
       localStorage.setItem("refresh_token", "rt");
       mockFetch.mockResolvedValue(
-        jsonRes({ detail: { error: "Error", message: "Server Error" } }, 500, "Internal Server Error"),
+        jsonRes(
+          { detail: { error: "Error", message: "Server Error" } },
+          500,
+          "Internal Server Error",
+        ),
       );
 
       await expect(logout()).rejects.toBeDefined();

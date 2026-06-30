@@ -88,9 +88,7 @@ describe("TaskItem", () => {
   });
 
   it("renders the task description when present", () => {
-    render(
-      <TaskItem task={makeTask({ description: "Milk and eggs" })} />,
-    );
+    render(<TaskItem task={makeTask({ description: "Milk and eggs" })} />);
     expect(screen.getByText("Milk and eggs")).toBeInTheDocument();
   });
 
@@ -105,9 +103,7 @@ describe("TaskItem", () => {
 
   describe("formatRelativeTime", () => {
     it("'just now' for an invalid (NaN) date string", () => {
-      render(
-        <TaskItem task={makeTask({ created_at: "not-a-date" })} />,
-      );
+      render(<TaskItem task={makeTask({ created_at: "not-a-date" })} />);
       expect(screen.getByRole("time")).toHaveTextContent("just now");
     });
 
@@ -157,33 +153,47 @@ describe("TaskItem", () => {
     });
 
     it("'6d ago' for 6 days ago (upper day boundary)", () => {
-      expect(renderWithAge(6 * 24 * 60 * 60 * 1000)).toHaveTextContent("6d ago");
+      expect(renderWithAge(6 * 24 * 60 * 60 * 1000)).toHaveTextContent(
+        "6d ago",
+      );
     });
 
     it("'1w ago' for exactly 7 days ago (week boundary)", () => {
-      expect(renderWithAge(7 * 24 * 60 * 60 * 1000)).toHaveTextContent("1w ago");
+      expect(renderWithAge(7 * 24 * 60 * 60 * 1000)).toHaveTextContent(
+        "1w ago",
+      );
     });
 
     it("'4w ago' for 34 days ago (upper week boundary, 34÷7=4)", () => {
-      expect(renderWithAge(34 * 24 * 60 * 60 * 1000)).toHaveTextContent("4w ago");
+      expect(renderWithAge(34 * 24 * 60 * 60 * 1000)).toHaveTextContent(
+        "4w ago",
+      );
     });
 
     it("'1mo ago' for 35 days ago (crosses 5-week threshold, 35÷30=1)", () => {
-      expect(renderWithAge(35 * 24 * 60 * 60 * 1000)).toHaveTextContent("1mo ago");
+      expect(renderWithAge(35 * 24 * 60 * 60 * 1000)).toHaveTextContent(
+        "1mo ago",
+      );
     });
 
     it("'11mo ago' for 364 days ago (364÷30=12… wait — 12 is not < 12 so goes to year)", () => {
       // Math.floor(364/30) = 12, which is NOT < 12 → falls through to year
       // Math.floor(364/365) = 0 → "0y ago" — documents the edge case
-      expect(renderWithAge(364 * 24 * 60 * 60 * 1000)).toHaveTextContent("0y ago");
+      expect(renderWithAge(364 * 24 * 60 * 60 * 1000)).toHaveTextContent(
+        "0y ago",
+      );
     });
 
     it("'1y ago' for exactly 365 days ago (year boundary)", () => {
-      expect(renderWithAge(365 * 24 * 60 * 60 * 1000)).toHaveTextContent("1y ago");
+      expect(renderWithAge(365 * 24 * 60 * 60 * 1000)).toHaveTextContent(
+        "1y ago",
+      );
     });
 
     it("'2y ago' for 730 days ago", () => {
-      expect(renderWithAge(730 * 24 * 60 * 60 * 1000)).toHaveTextContent("2y ago");
+      expect(renderWithAge(730 * 24 * 60 * 60 * 1000)).toHaveTextContent(
+        "2y ago",
+      );
     });
   });
 });

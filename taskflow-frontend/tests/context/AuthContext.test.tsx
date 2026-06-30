@@ -18,7 +18,11 @@ vi.mock("@/lib/api", () => ({
 }));
 
 import { useRouter } from "next/navigation";
-import { login as apiLogin, logout as apiLogout, register as apiRegister } from "@/lib/api";
+import {
+  login as apiLogin,
+  logout as apiLogout,
+  register as apiRegister,
+} from "@/lib/api";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -28,22 +32,25 @@ import { login as apiLogin, logout as apiLogout, register as apiRegister } from 
  * Create a base64url-encoded JWT payload so we can test AuthProvider's
  * token-reading logic without touching any source file.
  */
-function makeToken(
-  payload: Record<string, unknown>,
-  expired = false,
-): string {
+function makeToken(payload: Record<string, unknown>, expired = false): string {
   const now = Math.floor(Date.now() / 1000);
   const claims = {
     exp: expired ? now - 60 : now + 3600,
     ...payload,
   };
   const json = JSON.stringify(claims);
-  const b64 = btoa(json).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+  const b64 = btoa(json)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
   return `eyJhbGciOiJIUzI1NiJ9.${b64}.sig`;
 }
 
 const VALID_TOKEN = makeToken({ user_id: "u123", email: "test@example.com" });
-const EXPIRED_TOKEN = makeToken({ user_id: "u123", email: "test@example.com" }, true);
+const EXPIRED_TOKEN = makeToken(
+  { user_id: "u123", email: "test@example.com" },
+  true,
+);
 
 // ---------------------------------------------------------------------------
 // Test consumer
@@ -62,11 +69,17 @@ function AuthConsumer() {
       <div data-testid="authenticated">{String(isAuthenticated)}</div>
       <div data-testid="user-id">{user?.id ?? "none"}</div>
       <div data-testid="user-email">{user?.email ?? "none"}</div>
-      <button onClick={() => void login("test@example.com", "pass")}>login</button>
-      <button onClick={() => void register("test@example.com", "pass")}>register</button>
+      <button onClick={() => void login("test@example.com", "pass")}>
+        login
+      </button>
+      <button onClick={() => void register("test@example.com", "pass")}>
+        register
+      </button>
       {/* .catch prevents the re-thrown error from try/finally reaching the
           global unhandled-rejection handler when apiLogout is mocked to reject */}
-      <button onClick={() => void logout().catch(() => undefined)}>logout</button>
+      <button onClick={() => void logout().catch(() => undefined)}>
+        logout
+      </button>
     </div>
   );
 }
@@ -118,7 +131,9 @@ describe("AuthContext", () => {
 
     expect(screen.getByTestId("authenticated")).toHaveTextContent("true");
     expect(screen.getByTestId("user-id")).toHaveTextContent("u123");
-    expect(screen.getByTestId("user-email")).toHaveTextContent("test@example.com");
+    expect(screen.getByTestId("user-email")).toHaveTextContent(
+      "test@example.com",
+    );
   });
 
   it("rejects an expired token and removes it from localStorage", async () => {
@@ -168,7 +183,9 @@ describe("AuthContext", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("user-id")).toHaveTextContent("login_user");
-      expect(screen.getByTestId("user-email")).toHaveTextContent("login@example.com");
+      expect(screen.getByTestId("user-email")).toHaveTextContent(
+        "login@example.com",
+      );
       expect(screen.getByTestId("authenticated")).toHaveTextContent("true");
     });
   });

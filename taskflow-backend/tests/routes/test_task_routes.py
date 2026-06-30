@@ -11,8 +11,6 @@ get, update (partial semantics), delete, and unauthenticated access rejection.
 import pytest
 from uuid import uuid4
 
-from app.auth import get_current_user, hash_password
-from app.main import app
 from app.models import Task, User
 
 TASKS = "/api/v1/tasks/"
@@ -23,6 +21,7 @@ def _task_url(task_id) -> str:
 
 
 # ─── Create ───────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.routes
 class TestCreateTask:
@@ -61,6 +60,7 @@ class TestCreateTask:
 
 
 # ─── List ─────────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.routes
 class TestListTasks:
@@ -168,10 +168,13 @@ class TestListTasks:
 
 # ─── Get ──────────────────────────────────────────────────────────────────────
 
+
 @pytest.mark.routes
 class TestGetTask:
     async def test_existing_task_returns_200(self, authed_client):
-        task_id = (await authed_client.post(TASKS, json={"title": "Fetch me"})).json()["id"]
+        task_id = (await authed_client.post(TASKS, json={"title": "Fetch me"})).json()[
+            "id"
+        ]
         response = await authed_client.get(_task_url(task_id))
         assert response.status_code == 200
         assert response.json()["id"] == task_id
@@ -199,15 +202,16 @@ class TestGetTask:
 
 # ─── Update ───────────────────────────────────────────────────────────────────
 
+
 @pytest.mark.routes
 class TestUpdateTask:
     async def test_title_update_changes_only_title(self, authed_client):
-        task = (await authed_client.post(
-            TASKS, json={"title": "Old", "description": "Keep me"}
-        )).json()
-        response = await authed_client.put(
-            _task_url(task["id"]), json={"title": "New"}
-        )
+        task = (
+            await authed_client.post(
+                TASKS, json={"title": "Old", "description": "Keep me"}
+            )
+        ).json()
+        response = await authed_client.put(_task_url(task["id"]), json={"title": "New"})
         assert response.status_code == 200
         body = response.json()
         assert body["title"] == "New"
@@ -221,11 +225,15 @@ class TestUpdateTask:
         assert response.json()["status"] == "completed"
         assert response.json()["title"] == "Task"  # untouched
 
-    async def test_partial_update_leaves_all_unset_fields_unchanged(self, authed_client):
+    async def test_partial_update_leaves_all_unset_fields_unchanged(
+        self, authed_client
+    ):
         """exclude_unset semantics: only provided keys are written to the DB."""
-        task = (await authed_client.post(
-            TASKS, json={"title": "Original", "description": "Keep"}
-        )).json()
+        task = (
+            await authed_client.post(
+                TASKS, json={"title": "Original", "description": "Keep"}
+            )
+        ).json()
         await authed_client.put(_task_url(task["id"]), json={"status": "completed"})
         body = (await authed_client.get(_task_url(task["id"]))).json()
         assert body["title"] == "Original"
@@ -263,10 +271,13 @@ class TestUpdateTask:
 
 # ─── Delete ───────────────────────────────────────────────────────────────────
 
+
 @pytest.mark.routes
 class TestDeleteTask:
     async def test_existing_task_returns_204_no_content(self, authed_client):
-        task_id = (await authed_client.post(TASKS, json={"title": "Delete me"})).json()["id"]
+        task_id = (await authed_client.post(TASKS, json={"title": "Delete me"})).json()[
+            "id"
+        ]
         response = await authed_client.delete(_task_url(task_id))
         assert response.status_code == 204
 
@@ -277,7 +288,9 @@ class TestDeleteTask:
         assert response.status_code == 404
 
     async def test_deleted_task_no_longer_appears_in_list(self, authed_client):
-        task_id = (await authed_client.post(TASKS, json={"title": "Remove from list"})).json()["id"]
+        task_id = (
+            await authed_client.post(TASKS, json={"title": "Remove from list"})
+        ).json()["id"]
         await authed_client.delete(_task_url(task_id))
         body = (await authed_client.get(TASKS)).json()
         assert body["total"] == 0

@@ -13,7 +13,10 @@ const filters: Array<{ label: string; value: TaskFilter }> = [
   { label: "Completed", value: "completed" },
 ];
 
-export default function TaskFilters({ activeFilter, onFilterChange }: TaskFiltersProps) {
+export default function TaskFilters({
+  activeFilter,
+  onFilterChange,
+}: TaskFiltersProps) {
   return (
     <div className="flex gap-2">
       {filters.map((filter) => {

@@ -10,7 +10,13 @@ import {
   type ReactNode,
 } from "react";
 import * as api from "@/lib/api";
-import type { ApiError, Task, TaskListResponse, TaskStatus, UpdateTaskPayload } from "@/types";
+import type {
+  ApiError,
+  Task,
+  TaskListResponse,
+  TaskStatus,
+  UpdateTaskPayload,
+} from "@/types";
 
 type TaskContextValue = {
   tasks: Task[];
@@ -50,7 +56,9 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   const [pages, setPages] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilterState] = useState<TaskStatus | undefined>(undefined);
+  const [statusFilter, setStatusFilterState] = useState<TaskStatus | undefined>(
+    undefined,
+  );
 
   const fetchCounts = useCallback(async () => {
     try {
@@ -75,7 +83,11 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       setError(null);
       try {
-        const response = (await api.getTasks(nextPage, PAGE_SIZE, nextFilter)) as TaskListResponse;
+        const response = (await api.getTasks(
+          nextPage,
+          PAGE_SIZE,
+          nextFilter,
+        )) as TaskListResponse;
         setTasks(response.items);
         setTotal(response.total);
         setPageState(response.page);
@@ -126,7 +138,9 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     const previousTasks = tasks;
     try {
       if (previousTasks.find((t) => t.id === id)) {
-        setTasks((curr) => curr.map((t) => (t.id === id ? { ...t, ...payload } : t)));
+        setTasks((curr) =>
+          curr.map((t) => (t.id === id ? { ...t, ...payload } : t)),
+        );
       }
       const updated = await api.updateTask(id, payload);
       setTasks((curr) => curr.map((t) => (t.id === id ? updated : t)));

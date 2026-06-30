@@ -14,17 +14,17 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary:   "bg-brand text-white hover:bg-brand-hover",
+  primary: "bg-brand text-white hover:bg-brand-hover",
   secondary: "bg-brand-soft text-brand-fg hover:bg-brand-soft/80",
-  danger:    "bg-danger text-white hover:bg-danger/90",
-  ghost:     "bg-transparent text-ink hover:bg-canvas-input border border-line",
+  danger: "bg-danger text-white hover:bg-danger/90",
+  ghost: "bg-transparent text-ink hover:bg-canvas-input border border-line",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
   icon: "size-8 rounded-lg p-0 shrink-0",
-  sm:   "px-3 py-2 text-sm rounded-lg",
-  md:   "px-4 py-2 text-sm rounded-lg",
-  lg:   "px-6 py-3 text-base rounded-lg",
+  sm: "px-3 py-2 text-sm rounded-lg",
+  md: "px-4 py-2 text-sm rounded-lg",
+  lg: "px-6 py-3 text-base rounded-lg",
 };
 
 function Spinner() {
@@ -35,8 +35,19 @@ function Spinner() {
       viewBox="0 0 24 24"
       fill="none"
     >
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4Z" />
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4Z"
+      />
     </svg>
   );
 }

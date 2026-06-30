@@ -13,7 +13,11 @@ export default function Header() {
         {auth.isAuthenticated ? (
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-600">{auth.user?.email}</span>
-            <Button variant="ghost" size="sm" onClick={() => void auth.logout()}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => void auth.logout()}
+            >
               Logout
             </Button>
           </div>

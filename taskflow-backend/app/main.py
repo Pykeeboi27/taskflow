@@ -19,11 +19,11 @@ app = FastAPI(title="TaskFlow API", version="1.0.0")
 origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 
 app.add_middleware(
-	CORSMiddleware,
-	allow_origins=origins,
-	allow_credentials=True,
-	allow_methods=["*"],
-	allow_headers=["*"],
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.state.limiter = limiter
@@ -35,10 +35,10 @@ app.include_router(tasks_router)
 
 @app.on_event("startup")
 async def on_startup() -> None:
-	async with engine.begin() as connection:
-		await connection.run_sync(Base.metadata.create_all)
+    async with engine.begin() as connection:
+        await connection.run_sync(Base.metadata.create_all)
 
 
 @app.get("/")
 async def health_check() -> dict[str, str]:
-	return {"status": "ok", "service": "taskflow-api"}
+    return {"status": "ok", "service": "taskflow-api"}

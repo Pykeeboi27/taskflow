@@ -57,7 +57,9 @@ export default function LoginForm() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-ink tracking-tight">Sign in</h1>
-        <p className="text-sm text-ink-dim mt-1">Welcome back. Let&apos;s get to work.</p>
+        <p className="text-sm text-ink-dim mt-1">
+          Welcome back. Let&apos;s get to work.
+        </p>
       </div>
 
       {formError ? (
@@ -101,7 +103,10 @@ export default function LoginForm() {
 
       <p className="text-sm text-ink-dim">
         No account?{" "}
-        <Link href="/auth/register" className="text-brand font-medium hover:underline">
+        <Link
+          href="/auth/register"
+          className="text-brand font-medium hover:underline"
+        >
           Create one
         </Link>
       </p>

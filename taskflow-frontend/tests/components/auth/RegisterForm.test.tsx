@@ -83,12 +83,17 @@ async function fillAndSubmit({
     );
   }
   if (confirmPassword) {
-    await user.type(screen.getByPlaceholderText("Repeat password"), confirmPassword);
+    await user.type(
+      screen.getByPlaceholderText("Repeat password"),
+      confirmPassword,
+    );
   }
 
   // fireEvent.submit bypasses jsdom's native type="email" constraint validation
   // so our custom handleSubmit runs its own checks for all test cases.
-  const form = screen.getByRole("button", { name: /create account/i }).closest("form")!;
+  const form = screen
+    .getByRole("button", { name: /create account/i })
+    .closest("form")!;
   fireEvent.submit(form);
 }
 
@@ -111,7 +116,9 @@ describe("RegisterForm", () => {
   it("renders the form fields and submit button", () => {
     render(<RegisterForm />);
     expect(screen.getByPlaceholderText("you@example.com")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("At least 8 characters")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("At least 8 characters"),
+    ).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Repeat password")).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /create account/i }),
@@ -169,7 +176,10 @@ describe("RegisterForm", () => {
   // -------------------------------------------------------------------------
 
   it("shows a confirm-password error when passwords do not match", async () => {
-    await fillAndSubmit({ password: "password1", confirmPassword: "password2" });
+    await fillAndSubmit({
+      password: "password1",
+      confirmPassword: "password2",
+    });
 
     expect(
       await screen.findByText("Passwords do not match."),
@@ -210,7 +220,10 @@ describe("RegisterForm", () => {
     });
 
     await waitFor(() => {
-      expect(mockRegister).toHaveBeenCalledWith("user@example.com", "securepass");
+      expect(mockRegister).toHaveBeenCalledWith(
+        "user@example.com",
+        "securepass",
+      );
     });
   });
 
@@ -230,17 +243,17 @@ describe("RegisterForm", () => {
     mockRegister.mockRejectedValue({ message: "Email already in use." });
     await fillAndSubmit();
 
-    expect(
-      await screen.findByRole("alert"),
-    ).toHaveTextContent("Email already in use.");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Email already in use.",
+    );
   });
 
   it("displays the fallback message when the thrown error has no message", async () => {
     mockRegister.mockRejectedValue("unexpected string error");
     await fillAndSubmit();
 
-    expect(
-      await screen.findByRole("alert"),
-    ).toHaveTextContent("Registration failed. Please try again.");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Registration failed. Please try again.",
+    );
   });
 });

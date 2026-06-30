@@ -67,8 +67,12 @@ export default function RegisterForm() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-ink tracking-tight">Create account</h1>
-        <p className="text-sm text-ink-dim mt-1">Get started — it only takes a moment.</p>
+        <h1 className="text-2xl font-bold text-ink tracking-tight">
+          Create account
+        </h1>
+        <p className="text-sm text-ink-dim mt-1">
+          Get started — it only takes a moment.
+        </p>
       </div>
 
       {formError ? (
@@ -124,7 +128,10 @@ export default function RegisterForm() {
 
       <p className="text-sm text-ink-dim">
         Already have an account?{" "}
-        <Link href="/auth/login" className="text-brand font-medium hover:underline">
+        <Link
+          href="/auth/login"
+          className="text-brand font-medium hover:underline"
+        >
           Sign in
         </Link>
       </p>

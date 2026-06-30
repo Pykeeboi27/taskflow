@@ -70,7 +70,9 @@ export default function TaskForm({ onSuccess }: TaskFormProps) {
           className="text-[11px] font-medium tracking-wide uppercase text-ink-dim"
         >
           Description{" "}
-          <span className="normal-case font-normal text-ink-muted">(optional)</span>
+          <span className="normal-case font-normal text-ink-muted">
+            (optional)
+          </span>
         </label>
         <textarea
           id="task-description"

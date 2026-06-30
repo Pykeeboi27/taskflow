@@ -3,37 +3,38 @@
 /* ── Design tokens: emitted as :root CSS vars + Tailwind utilities ── */
 @theme {
   /* Brand — "Ink" violet */
-  --color-brand:       #5B5BD6;
-  --color-brand-hover: #4747C2;
-  --color-brand-soft:  #EDEDFB;
-  --color-brand-fg:    #3E3E9E;
+  --color-brand: #5b5bd6;
+  --color-brand-hover: #4747c2;
+  --color-brand-soft: #ededfb;
+  --color-brand-fg: #3e3e9e;
 
   /* Canvas (surfaces) */
-  --color-canvas:        #FAFAF9;
-  --color-canvas-raised: #FFFFFF;
-  --color-canvas-input:  #F4F4F2;
+  --color-canvas: #fafaf9;
+  --color-canvas-raised: #ffffff;
+  --color-canvas-input: #f4f4f2;
 
   /* Lines (borders) */
-  --color-line:        #E8E8E4;
-  --color-line-strong: #C8C8C2;
+  --color-line: #e8e8e4;
+  --color-line-strong: #c8c8c2;
 
   /* Ink (text) */
-  --color-ink:        #1A1A18;
-  --color-ink-dim:    #6B6B63;
-  --color-ink-muted:  #9B9B92;
+  --color-ink: #1a1a18;
+  --color-ink-dim: #6b6b63;
+  --color-ink-muted: #9b9b92;
 
   /* Semantic */
-  --color-danger:      #D93026;
-  --color-danger-tint: #FEF0EE;
-  --color-success:     #18794E;
-  --color-success-tint:#EFFAF4;
-  --color-warn:        #B45309;
-  --color-warn-tint:   #FEF3C7;
+  --color-danger: #d93026;
+  --color-danger-tint: #fef0ee;
+  --color-success: #18794e;
+  --color-success-tint: #effaf4;
+  --color-warn: #b45309;
+  --color-warn-tint: #fef3c7;
 
   /* Shadows */
-  --shadow-card:   0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-raised: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
-  --shadow-modal:  0 16px 40px rgba(0,0,0,0.12);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-raised:
+    0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-modal: 0 16px 40px rgba(0, 0, 0, 0.12);
 }
 
 /* ── Fonts: reference Next.js CSS vars (must stay inline) ── */
@@ -48,32 +49,33 @@
 /* Dark mode token overrides — must be in @layer base so Tailwind doesn't strip them */
 @layer base {
   .dark {
-    --color-brand:        #6E6EDB;
-    --color-brand-hover:  #7E7EE4;
-    --color-brand-soft:   #1E1E3A;
-    --color-brand-fg:     #A0A0E8;
+    --color-brand: #6e6edb;
+    --color-brand-hover: #7e7ee4;
+    --color-brand-soft: #1e1e3a;
+    --color-brand-fg: #a0a0e8;
 
-    --color-canvas:        #111110;
-    --color-canvas-raised: #1C1C1A;
-    --color-canvas-input:  #252523;
+    --color-canvas: #111110;
+    --color-canvas-raised: #1c1c1a;
+    --color-canvas-input: #252523;
 
-    --color-line:        #2E2E2C;
+    --color-line: #2e2e2c;
     --color-line-strong: #424240;
 
-    --color-ink:        #EDEDEC;
-    --color-ink-dim:    #9B9B92;
-    --color-ink-muted:  #6B6B63;
+    --color-ink: #ededec;
+    --color-ink-dim: #9b9b92;
+    --color-ink-muted: #6b6b63;
 
-    --color-danger:      #E5534B;
-    --color-danger-tint: #1F0F0F;
-    --color-success:     #30A46C;
-    --color-success-tint:#0D1F14;
-    --color-warn:        #F5A623;
-    --color-warn-tint:   #1F1506;
+    --color-danger: #e5534b;
+    --color-danger-tint: #1f0f0f;
+    --color-success: #30a46c;
+    --color-success-tint: #0d1f14;
+    --color-warn: #f5a623;
+    --color-warn-tint: #1f1506;
 
-    --shadow-card:   0 1px 3px rgba(0,0,0,0.3),  0 1px 2px rgba(0,0,0,0.2);
-    --shadow-raised: 0 4px 12px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2);
-    --shadow-modal:  0 16px 40px rgba(0,0,0,0.6);
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-raised:
+      0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-modal: 0 16px 40px rgba(0, 0, 0, 0.6);
   }
 }
 

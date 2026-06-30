@@ -8,9 +8,20 @@ import { useTheme } from "@/hooks/useTheme";
 
 function LogoMark() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
       <rect width="24" height="24" rx="6" fill="var(--color-brand)" />
-      <path d="M7 8h10M7 12h6M7 16h8" stroke="white" strokeWidth="2" strokeLinecap="round" />
+      <path
+        d="M7 8h10M7 12h6M7 16h8"
+        stroke="white"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -56,7 +67,9 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
 
         <div className="flex items-center gap-2.5">
           <LogoMark />
-          <span className="text-sm font-semibold text-ink tracking-tight">TaskFlow</span>
+          <span className="text-sm font-semibold text-ink tracking-tight">
+            TaskFlow
+          </span>
         </div>
       </div>
 
@@ -97,7 +110,9 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-ink-muted">
                   Signed in as
                 </p>
-                <p className="text-sm text-ink truncate mt-0.5">{user?.email}</p>
+                <p className="text-sm text-ink truncate mt-0.5">
+                  {user?.email}
+                </p>
               </div>
               <button
                 type="button"

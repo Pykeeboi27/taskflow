@@ -18,7 +18,8 @@ function formatRelativeTime(dateStr: string): string {
   const diffSeconds = Math.floor(diffMs / 1000);
 
   if (Number.isNaN(date.getTime()) || diffSeconds < 0) return "just now";
-  if (diffSeconds < 60) return diffSeconds <= 5 ? "just now" : `${diffSeconds}s ago`;
+  if (diffSeconds < 60)
+    return diffSeconds <= 5 ? "just now" : `${diffSeconds}s ago`;
 
   const diffMinutes = Math.floor(diffSeconds / 60);
   if (diffMinutes < 60) return `${diffMinutes}m ago`;
@@ -43,7 +44,9 @@ export default function TaskItem({ task }: TaskItemProps) {
   const { addToast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
-  const [editDescription, setEditDescription] = useState(task.description ?? "");
+  const [editDescription, setEditDescription] = useState(
+    task.description ?? "",
+  );
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -53,7 +56,9 @@ export default function TaskItem({ task }: TaskItemProps) {
   const handleToggleStatus = async () => {
     setIsUpdating(true);
     try {
-      await updateTask(task.id, { status: isCompleted ? "pending" : "completed" });
+      await updateTask(task.id, {
+        status: isCompleted ? "pending" : "completed",
+      });
     } catch {
       addToast("Failed to update task.", "error");
     } finally {
@@ -120,10 +125,19 @@ export default function TaskItem({ task }: TaskItemProps) {
               placeholder="Description (optional)"
             />
             <div className="flex gap-2 justify-end">
-              <Button variant="primary" size="sm" isLoading={isUpdating} onClick={handleSave}>
+              <Button
+                variant="primary"
+                size="sm"
+                isLoading={isUpdating}
+                onClick={handleSave}
+              >
                 Save
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditing(false)}
+              >
                 Cancel
               </Button>
             </div>
@@ -157,14 +171,24 @@ export default function TaskItem({ task }: TaskItemProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                aria-label={isCompleted ? "Mark as pending" : "Mark as complete"}
+                aria-label={
+                  isCompleted ? "Mark as pending" : "Mark as complete"
+                }
                 isLoading={isUpdating}
                 onClick={handleToggleStatus}
               >
                 {isCompleted ? (
-                  <Circle size={14} className="text-ink-muted" aria-hidden="true" />
+                  <Circle
+                    size={14}
+                    className="text-ink-muted"
+                    aria-hidden="true"
+                  />
                 ) : (
-                  <CheckCircle2 size={14} className="text-success" aria-hidden="true" />
+                  <CheckCircle2
+                    size={14}
+                    className="text-success"
+                    aria-hidden="true"
+                  />
                 )}
               </Button>
               <Button
@@ -203,7 +227,11 @@ export default function TaskItem({ task }: TaskItemProps) {
           &ldquo;{task.title}&rdquo; will be permanently removed.
         </p>
         <div className="flex gap-2 justify-end">
-          <Button variant="ghost" size="sm" onClick={() => setShowDeleteModal(false)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowDeleteModal(false)}
+          >
             Cancel
           </Button>
           <Button

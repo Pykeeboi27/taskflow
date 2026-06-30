@@ -3,7 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import * as api from "@/lib/api";
-import type { ApiError, Task, TaskListResponse, TaskStatus, UpdateTaskPayload } from "@/types";
+import type {
+  ApiError,
+  Task,
+  TaskListResponse,
+  TaskStatus,
+  UpdateTaskPayload,
+} from "@/types";
 
 type UseTasksResult = {
   tasks: Task[];
@@ -41,7 +47,9 @@ export function useTasks(initialPage = 1, initialLimit = 10): UseTasksResult {
   const [pages, setPages] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilterState] = useState<TaskStatus | undefined>(undefined);
+  const [statusFilter, setStatusFilterState] = useState<TaskStatus | undefined>(
+    undefined,
+  );
 
   const fetchTasks = useCallback(
     async (
@@ -125,7 +133,9 @@ export function useTasks(initialPage = 1, initialLimit = 10): UseTasksResult {
 
       if (optimisticTask) {
         setTasks((currentTasks) =>
-          currentTasks.map((task) => (task.id === id ? { ...task, ...payload } : task)),
+          currentTasks.map((task) =>
+            task.id === id ? { ...task, ...payload } : task,
+          ),
         );
       }
 

@@ -10,7 +10,8 @@ import { SkeletonCard } from "@/components/Common/Loading";
 import { useTaskContext } from "@/context/TaskContext";
 
 export default function TaskList() {
-  const { tasks, total, page, pages, isLoading, error, setPage } = useTaskContext();
+  const { tasks, total, page, pages, isLoading, error, setPage } =
+    useTaskContext();
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const totalPages = pages > 0 ? pages : 1;
@@ -48,10 +49,16 @@ export default function TaskList() {
         </div>
       ) : tasks.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 sm:py-20 gap-4">
-          <ClipboardList size={40} className="text-ink-muted" aria-hidden="true" />
+          <ClipboardList
+            size={40}
+            className="text-ink-muted"
+            aria-hidden="true"
+          />
           <div className="text-center">
             <p className="text-sm font-medium text-ink">No tasks yet</p>
-            <p className="text-xs text-ink-dim mt-1">Create your first task to get started.</p>
+            <p className="text-xs text-ink-dim mt-1">
+              Create your first task to get started.
+            </p>
           </div>
           <Button variant="secondary" onClick={() => setSheetOpen(true)}>
             <Plus size={13} aria-hidden="true" />
@@ -97,7 +104,11 @@ export default function TaskList() {
         </>
       )}
 
-      <Sheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="New Task">
+      <Sheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        title="New Task"
+      >
         <TaskForm onSuccess={() => setSheetOpen(false)} />
       </Sheet>
     </>

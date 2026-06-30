@@ -5,14 +5,14 @@ import { useToast } from "@/context/ToastContext";
 
 const accentClasses = {
   success: "border-l-success",
-  error:   "border-l-danger",
-  info:    "border-l-brand",
+  error: "border-l-danger",
+  info: "border-l-brand",
 };
 
 const textClasses = {
   success: "text-success",
-  error:   "text-danger",
-  info:    "text-brand-fg",
+  error: "text-danger",
+  info: "text-brand-fg",
 };
 
 export default function ToastStack() {
@@ -31,7 +31,9 @@ export default function ToastStack() {
           key={toast.id}
           className={`flex items-start gap-3 min-w-[280px] max-w-sm bg-canvas-raised rounded-xl shadow-modal border border-line border-l-4 px-4 py-3 ${accentClasses[toast.type]}`}
         >
-          <p className={`flex-1 text-sm font-medium ${textClasses[toast.type]}`}>
+          <p
+            className={`flex-1 text-sm font-medium ${textClasses[toast.type]}`}
+          >
             {toast.message}
           </p>
           <button

@@ -17,7 +17,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "TaskFlow — Task management, simplified",
-  description: "TaskFlow helps you manage your tasks with a clean, minimal interface.",
+  description:
+    "TaskFlow helps you manage your tasks with a clean, minimal interface.",
   icons: {
     icon: "/favicon.svg",
   },
@@ -36,7 +37,11 @@ export default function RootLayout({
     >
       <body className="min-h-full">
         {/* Prevent flash of wrong theme before React hydrates */}
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('tf-theme');var d=document.documentElement;if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){d.classList.add('dark');}}catch(e){}})();` }} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('tf-theme');var d=document.documentElement;if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){d.classList.add('dark');}}catch(e){}})();`,
+          }}
+        />
         <AuthProvider>
           <ToastProvider>
             {children}

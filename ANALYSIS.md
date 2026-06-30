@@ -261,8 +261,8 @@ External dependencies:
 
 ### CRITICAL — API path mismatch: all frontend requests hit wrong URLs
 
-**File:** `src/lib/api.ts` — every API call  
-**Severity:** Critical  
+**File:** `src/lib/api.ts` — every API call
+**Severity:** Critical
 **Root cause:** The backend registers all routes under `/api/v1/` prefix (auth router: `prefix="/api/v1/auth"`, tasks router: `prefix="/api/v1/tasks"`). The frontend calls `/auth/login`, `/tasks`, etc. with no `/api/v1` prefix.
 
 ```
@@ -284,8 +284,8 @@ export const BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:80
 
 ### CRITICAL — Backend error messages never reach the user
 
-**File:** `src/lib/api.ts:72-87`  
-**Severity:** Critical  
+**File:** `src/lib/api.ts:72-87`
+**Severity:** Critical
 **Root cause:** FastAPI returns errors as `{"detail": {"error": "...", "message": "...", "field": "..."}}`. The `parseErrorResponse` function reads `payload.error`, `payload.message`, `payload.field` from the top level. Since the data is nested under `detail`, all three are `undefined`, and users always see `"Request failed"` instead of meaningful messages like `"Invalid email or password"`.
 
 ```ts
@@ -315,8 +315,8 @@ async function parseErrorResponse(response: Response): Promise<ApiErrorResponse>
 
 ### HIGH — `useTasks` pagination resets to page 1 on every page change
 
-**File:** `src/hooks/useTasks.ts:46-78`  
-**Severity:** High  
+**File:** `src/hooks/useTasks.ts:46-78`
+**Severity:** High
 **Root cause:** `fetchTasks` is in a `useCallback` with deps `[limit, page, statusFilter]`. When `setPage(2)` is called, `page` state changes → `fetchTasks` gets a new reference → the `useEffect` fires again (because `fetchTasks` is in its deps array) → the effect calls `fetchTasks(initialPage, initialLimit, undefined)` (always 1, 10), resetting pagination back to page 1.
 
 **Fix:** Stabilize the effect — either use a ref to track initial-mount-only, or restructure `fetchTasks` to not be a dependency of the initial-load effect:
@@ -335,8 +335,8 @@ useEffect(() => {
 
 ### MEDIUM — `isValidEmail` check is too weak
 
-**File:** `src/components/Auth/RegisterForm.tsx:19-21`  
-**Severity:** Medium  
+**File:** `src/components/Auth/RegisterForm.tsx:19-21`
+**Severity:** Medium
 **Root cause:** Only checks if the string contains `"@"`. Inputs like `"@"`, `"a@"`, or `"@b"` all pass. The backend catches this with Pydantic's `EmailStr`, so it won't persist, but the UX gives no immediate feedback.
 
 **Fix:** Use `type="email"` browser validation (already in use) and optionally add a basic regex, or rely solely on the server response.
@@ -345,8 +345,8 @@ useEffect(() => {
 
 ### LOW — `refreshTokensInternal` casts response to wrong type
 
-**File:** `src/lib/api.ts:119`  
-**Severity:** Low  
+**File:** `src/lib/api.ts:119`
+**Severity:** Low
 **Root cause:** The `/auth/refresh` endpoint returns `{access_token, refresh_token}` (`RefreshResponse`), but the code casts it to `AuthResponse` (which also includes `user_id`, `email`). The extra fields are simply absent at runtime; only `access_token` and `refresh_token` are used, so it works, but the type is incorrect.
 
 **Fix:** Change to the correct type: `const tokens = await response.json() as { access_token: string; refresh_token: string };`
@@ -355,8 +355,8 @@ useEffect(() => {
 
 ### LOW — Dead render: `<PageLoader>` rendered hidden
 
-**File:** `src/components/Tasks/TaskList.tsx:46-48`  
-**Severity:** Low  
+**File:** `src/components/Tasks/TaskList.tsx:46-48`
+**Severity:** Low
 **Root cause:** `<PageLoader />` is rendered inside `<div className="hidden">`. It serves no functional purpose and wastes a render.
 
 **Fix:** Delete lines 46–48.
@@ -365,8 +365,8 @@ useEffect(() => {
 
 ### LOW — Saving an edited task with empty description sends `""` instead of `null`
 
-**File:** `src/components/Tasks/TaskItem.tsx:59,79`  
-**Severity:** Low  
+**File:** `src/components/Tasks/TaskItem.tsx:59,79`
+**Severity:** Low
 **Root cause:** `editDescription` is initialized to `task.description ?? ""`. When saved, it always sends a string. If the user clears the description, the backend stores `""` instead of `NULL`.
 
 **Fix:**
@@ -380,7 +380,7 @@ description: editDescription.trim() || undefined,
 
 ### HIGH — No error boundary anywhere in the component tree
 
-**Severity:** High  
+**Severity:** High
 Any unhandled JavaScript error in any component will crash the entire app with a blank screen. Next.js does provide a default error boundary for the App Router, but there are no custom `error.tsx` files to give users a graceful recovery UI.
 
 **Fix:** Add `error.tsx` files at the route level (e.g., `src/app/dashboard/error.tsx`).
@@ -389,16 +389,16 @@ Any unhandled JavaScript error in any component will crash the entire app with a
 
 ### MEDIUM — Unhandled rejection in `AuthGuard` / `Header` logout
 
-**File:** `src/components/Layout/Header.tsx:16`  
-**Severity:** Medium  
+**File:** `src/components/Layout/Header.tsx:16`
+**Severity:** Medium
 `onClick={() => void auth.logout()}` — if `logout()` throws, the error is silently dropped (`void`). The `AuthContext.logout` already has a `try/finally`, so the user is always redirected, but any network error during the logout API call is never surfaced.
 
 ---
 
 ### MEDIUM — Token expiry not checked on page load
 
-**File:** `src/context/AuthContext.tsx:82-88`  
-**Severity:** Medium  
+**File:** `src/context/AuthContext.tsx:82-88`
+**Severity:** Medium
 On mount, the token is decoded to get user info, but the `exp` field is never checked. An expired token makes the user appear authenticated until the first API call fails with 401. The auto-refresh then fires, but the UX flash (seeing the dashboard briefly) is confusing.
 
 **Fix:** Check `payload.exp` during `userFromToken()`:
@@ -410,8 +410,8 @@ if (typeof payload.exp === "number" && payload.exp * 1000 < Date.now()) return n
 
 ### LOW — Race condition in task updates
 
-**File:** `src/hooks/useTasks.ts:111-135`  
-**Severity:** Low  
+**File:** `src/hooks/useTasks.ts:111-135`
+**Severity:** Low
 If the user rapidly toggles task status (complete → undo → complete), multiple concurrent `updateTask` API calls are in-flight. The optimistic update and rollback logic may restore an outdated state depending on which response arrives last. There is no request cancellation.
 
 ---
@@ -420,8 +420,8 @@ If the user rapidly toggles task status (complete → undo → complete), multip
 
 ### CRITICAL — `SECRET_KEY` is the placeholder value
 
-**File:** `taskflow-backend/.env:2`  
-**Severity:** Critical  
+**File:** `taskflow-backend/.env:2`
+**Severity:** Critical
 ```
 SECRET_KEY=your-secret-key-here
 ```
@@ -437,8 +437,8 @@ Set the result as `SECRET_KEY` in `.env`. Never commit `.env` — add it to `.gi
 
 ### HIGH — Logout does not invalidate tokens (no token blacklist)
 
-**File:** `taskflow-backend/app/routers/auth.py:140-143`  
-**Severity:** High  
+**File:** `taskflow-backend/app/routers/auth.py:140-143`
+**Severity:** High
 The logout endpoint just returns `{"message": "Logout successful"}`. The JWT remains cryptographically valid until it expires (up to 60 minutes for access, 7 days for refresh). If a token is stolen, there is no way to revoke it.
 
 **Fix:** For a lightweight solution, maintain a short-lived server-side blocklist (in-memory set or Redis) of revoked `jti` (JWT ID) claims. Add `jti` to every token payload and check it on each request.
@@ -447,8 +447,8 @@ The logout endpoint just returns `{"message": "Logout successful"}`. The JWT rem
 
 ### HIGH — No rate limiting on authentication endpoints
 
-**File:** `taskflow-backend/app/routers/auth.py`  
-**Severity:** High  
+**File:** `taskflow-backend/app/routers/auth.py`
+**Severity:** High
 `/api/v1/auth/login` and `/api/v1/auth/register` have no rate limiting. An attacker can brute-force passwords or flood registration.
 
 **Fix:** Add `slowapi` (FastAPI rate-limiting middleware) to the auth router.
@@ -457,8 +457,8 @@ The logout endpoint just returns `{"message": "Logout successful"}`. The JWT rem
 
 ### MEDIUM — `.env` should not be committed to version control
 
-**File:** `taskflow-backend/.env`  
-**Severity:** Medium  
+**File:** `taskflow-backend/.env`
+**Severity:** Medium
 The `.env` file is present and contains credentials. It does not appear in a `.gitignore` (no `.gitignore` was found in either project). If committed, secrets become permanently part of git history.
 
 **Fix:** Add `.env` to `.gitignore` in both frontend and backend. Use `.env.example` to document required variables.
@@ -467,8 +467,8 @@ The `.env` file is present and contains credentials. It does not appear in a `.g
 
 ### MEDIUM — CORS locked to `localhost:3000` only
 
-**File:** `taskflow-backend/app/main.py:13-18`  
-**Severity:** Medium  
+**File:** `taskflow-backend/app/main.py:13-18`
+**Severity:** Medium
 CORS is hardcoded to `http://localhost:3000`. Acceptable for development, but this must be made environment-configurable before any deployment.
 
 **Fix:**
@@ -481,8 +481,8 @@ app.add_middleware(CORSMiddleware, allow_origins=origins, ...)
 
 ### LOW — Tokens stored in `localStorage` (XSS risk)
 
-**File:** `src/lib/api.ts:26-48`  
-**Severity:** Low  
+**File:** `src/lib/api.ts:26-48`
+**Severity:** Low
 `localStorage` is accessible to any JavaScript on the page. An XSS vulnerability (e.g., from a malicious dependency) could steal both tokens.
 
 **Fix:** For higher security, use `httpOnly` cookies. This requires backend changes to set/clear cookies and frontend changes to drop the manual token storage.
@@ -491,8 +491,8 @@ app.add_middleware(CORSMiddleware, allow_origins=origins, ...)
 
 ### LOW — `@app.on_event("startup")` is deprecated
 
-**File:** `taskflow-backend/app/main.py:25`  
-**Severity:** Low  
+**File:** `taskflow-backend/app/main.py:25`
+**Severity:** Low
 FastAPI deprecated `on_event` in favor of the `lifespan` context manager. This works but generates deprecation warnings.
 
 **Fix:**
@@ -514,24 +514,24 @@ app = FastAPI(title="TaskFlow API", lifespan=lifespan)
 
 ### LOW — Two separate DB queries for paginated task list (could be one)
 
-**File:** `taskflow-backend/app/routers/tasks.py:56-66`  
-**Severity:** Low  
+**File:** `taskflow-backend/app/routers/tasks.py:56-66`
+**Severity:** Low
 The list endpoint runs two queries: one for `COUNT(*)` and one for the page of results. For SQLite at this scale, the overhead is negligible. For larger datasets, a window function or a single query returning both could improve efficiency.
 
 ---
 
 ### LOW — `useMemo` on status styles is unnecessary
 
-**File:** `src/components/Tasks/TaskItem.tsx:65-71`  
-**Severity:** Low  
+**File:** `src/components/Tasks/TaskItem.tsx:65-71`
+**Severity:** Low
 `useMemo` for a simple string ternary over a single primitive value (`task.status`) adds hook overhead with no measurable gain. Plain inline computation is faster here.
 
 ---
 
 ### LOW — Every task update re-fetches the full list
 
-**File:** `src/hooks/useTasks.ts:101-108`  
-**Severity:** Low  
+**File:** `src/hooks/useTasks.ts:101-108`
+**Severity:** Low
 `createTask` calls `fetchTasks()` after every creation, which re-fetches the entire current page. For small task counts this is fine. Optimistic updates (already implemented for `updateTask`) would be more efficient for `createTask` too.
 
 ---

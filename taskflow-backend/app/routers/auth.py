@@ -12,7 +12,6 @@ from app.auth import (
     decode_token,
     get_current_user,
     hash_password,
-    is_token_revoked,
     oauth2_scheme,
     revoke_token,
     verify_password,
@@ -32,7 +31,9 @@ from app.schemas import (
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
 
-def _auth_error(status_code: int, error: str, message: str, field: str | None = None) -> HTTPException:
+def _auth_error(
+    status_code: int, error: str, message: str, field: str | None = None
+) -> HTTPException:
     return HTTPException(
         status_code=status_code,
         detail={"error": error, "message": message, "field": field},
@@ -43,9 +44,13 @@ def _token_payload(user: User) -> dict:
     return {"sub": str(user.id), "user_id": str(user.id), "email": user.email}
 
 
-@router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED
+)
 @limiter.limit("5/minute")
-async def register(request: Request, payload: RegisterRequest, db: AsyncSession = Depends(get_db)) -> TokenResponse:
+async def register(
+    request: Request, payload: RegisterRequest, db: AsyncSession = Depends(get_db)
+) -> TokenResponse:
     result = await db.execute(select(User).where(User.email == payload.email))
     existing_user = result.scalar_one_or_none()
 
@@ -73,7 +78,9 @@ async def register(request: Request, payload: RegisterRequest, db: AsyncSession 
 
 @router.post("/login", response_model=TokenResponse)
 @limiter.limit("5/minute")
-async def login(request: Request, payload: LoginRequest, db: AsyncSession = Depends(get_db)) -> TokenResponse:
+async def login(
+    request: Request, payload: LoginRequest, db: AsyncSession = Depends(get_db)
+) -> TokenResponse:
     result = await db.execute(select(User).where(User.email == payload.email))
     user = result.scalar_one_or_none()
 
@@ -95,7 +102,9 @@ async def login(request: Request, payload: LoginRequest, db: AsyncSession = Depe
 
 
 @router.post("/refresh", response_model=RefreshResponse)
-async def refresh(payload: RefreshRequest, db: AsyncSession = Depends(get_db)) -> RefreshResponse:
+async def refresh(
+    payload: RefreshRequest, db: AsyncSession = Depends(get_db)
+) -> RefreshResponse:
     token_data = decode_token(payload.refresh_token)
     if token_data.get("token_type") != "refresh":
         raise _auth_error(

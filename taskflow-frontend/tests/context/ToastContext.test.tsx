@@ -19,13 +19,19 @@ function ToastConsumer() {
           <button onClick={() => removeToast(t.id)}>dismiss</button>
         </div>
       ))}
-      <button onClick={() => addToast("hello", "success")} data-testid="add-success">
+      <button
+        onClick={() => addToast("hello", "success")}
+        data-testid="add-success"
+      >
         add success
       </button>
       <button onClick={() => addToast("world")} data-testid="add-info">
         add info
       </button>
-      <button onClick={() => addToast("error!", "error")} data-testid="add-error">
+      <button
+        onClick={() => addToast("error!", "error")}
+        data-testid="add-error"
+      >
         add error
       </button>
     </div>
@@ -71,7 +77,9 @@ describe("ToastContext", () => {
     fireEvent.click(screen.getByTestId("add-success"));
     fireEvent.click(screen.getByTestId("add-info"));
 
-    const ids = screen.getAllByTestId("toast-id").map((el) => el.textContent ?? "");
+    const ids = screen
+      .getAllByTestId("toast-id")
+      .map((el) => el.textContent ?? "");
     expect(ids[0]).toBeTruthy();
     expect(ids[1]).toBeTruthy();
     expect(ids[0]).not.toBe(ids[1]);
@@ -138,7 +146,9 @@ describe("ToastContext", () => {
       useToast();
       return null;
     }
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const consoleSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
     expect(() => render(<BadConsumer />)).toThrow(
       "useToast must be used within ToastProvider",
     );

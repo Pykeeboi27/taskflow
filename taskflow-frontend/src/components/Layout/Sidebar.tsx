@@ -5,8 +5,8 @@ import { useTaskContext } from "@/context/TaskContext";
 import type { TaskStatus } from "@/types";
 
 const filters: Array<{ label: string; value: TaskStatus | undefined }> = [
-  { label: "All tasks",  value: undefined },
-  { label: "Pending",   value: "pending" },
+  { label: "All tasks", value: undefined },
+  { label: "Pending", value: "pending" },
   { label: "Completed", value: "completed" },
 ];
 
@@ -19,9 +19,9 @@ export default function Sidebar({ onClose }: SidebarProps) {
     useTaskContext();
 
   const counts: Record<string, number> = {
-    "All tasks":  total,
-    "Pending":    pendingCount,
-    "Completed":  completedCount,
+    "All tasks": total,
+    Pending: pendingCount,
+    Completed: completedCount,
   };
 
   return (

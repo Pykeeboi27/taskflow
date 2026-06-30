@@ -40,7 +40,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         </p>
       ) : null}
       {error ? (
-        <p id={`${inputId}-error`} role="alert" className="text-xs text-danger mt-1">
+        <p
+          id={`${inputId}-error`}
+          role="alert"
+          className="text-xs text-danger mt-1"
+        >
           {error}
         </p>
       ) : null}

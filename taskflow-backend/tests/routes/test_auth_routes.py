@@ -33,6 +33,7 @@ _VALID_USER = {"email": "user@example.com", "password": "password123"}
 
 # ─── Register ─────────────────────────────────────────────────────────────────
 
+
 @pytest.mark.routes
 class TestRegister:
     async def test_returns_201_with_tokens_and_user_info(self, client):
@@ -78,7 +79,10 @@ class TestRegister:
             for i in range(5):
                 await client.post(
                     REGISTER,
-                    json={"email": f"ratelimit{i}@example.com", "password": "password123"},
+                    json={
+                        "email": f"ratelimit{i}@example.com",
+                        "password": "password123",
+                    },
                 )
             response = await client.post(
                 REGISTER,
@@ -90,6 +94,7 @@ class TestRegister:
 
 
 # ─── Login ────────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.routes
 class TestLogin:
@@ -125,6 +130,7 @@ class TestLogin:
 
 # ─── Refresh ──────────────────────────────────────────────────────────────────
 
+
 @pytest.mark.routes
 class TestRefresh:
     async def test_valid_refresh_token_returns_new_token_pair(self, client):
@@ -145,9 +151,7 @@ class TestRefresh:
         assert response.json()["detail"]["error"] == "invalid_token"
 
     async def test_malformed_token_returns_401(self, client):
-        response = await client.post(
-            REFRESH, json={"refresh_token": "this.is.garbage"}
-        )
+        response = await client.post(REFRESH, json={"refresh_token": "this.is.garbage"})
         assert response.status_code == 401
 
     async def test_expired_refresh_token_returns_401(self, client):
@@ -172,12 +176,12 @@ class TestRefresh:
 
         reg = await client.post(REGISTER, json=_VALID_USER)
         refresh_token = reg.json()["refresh_token"]
-        user_id = _UUID(reg.json()["user_id"])  # JSON gives str; SQLAlchemy Uuid needs UUID
+        user_id = _UUID(
+            reg.json()["user_id"]
+        )  # JSON gives str; SQLAlchemy Uuid needs UUID
 
         # Remove the user directly
-        result = await db_session.execute(
-            select(User).where(User.id == user_id)
-        )
+        result = await db_session.execute(select(User).where(User.id == user_id))
         user = result.scalar_one()
         await db_session.delete(user)
         await db_session.commit()
@@ -188,6 +192,7 @@ class TestRefresh:
 
 
 # ─── Logout ───────────────────────────────────────────────────────────────────
+
 
 @pytest.mark.routes
 class TestLogout:
@@ -222,6 +227,7 @@ class TestLogout:
 
 # ─── get_current_user dependency (tested through protected endpoints) ─────────
 
+
 @pytest.mark.routes
 class TestGetCurrentUser:
     """
@@ -242,9 +248,7 @@ class TestGetCurrentUser:
             SECRET_KEY,
             algorithm=ALGORITHM,
         )
-        response = await client.get(
-            TASKS, headers={"Authorization": f"Bearer {token}"}
-        )
+        response = await client.get(TASKS, headers={"Authorization": f"Bearer {token}"})
         assert response.status_code == 401
 
     async def test_token_for_nonexistent_user_returns_401(self, client):
@@ -252,16 +256,12 @@ class TestGetCurrentUser:
         token = create_access_token(
             {"user_id": str(uuid4()), "email": "ghost@example.com"}
         )
-        response = await client.get(
-            TASKS, headers={"Authorization": f"Bearer {token}"}
-        )
+        response = await client.get(TASKS, headers={"Authorization": f"Bearer {token}"})
         assert response.status_code == 401
 
     async def test_valid_token_grants_access(self, client):
         """End-to-end: register → use the token → successfully reach a protected route."""
         reg = await client.post(REGISTER, json=_VALID_USER)
         token = reg.json()["access_token"]
-        response = await client.get(
-            TASKS, headers={"Authorization": f"Bearer {token}"}
-        )
+        response = await client.get(TASKS, headers={"Authorization": f"Bearer {token}"})
         assert response.status_code == 200

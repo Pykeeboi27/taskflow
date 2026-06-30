@@ -29,6 +29,7 @@ from app.auth import (
 
 # ─── hash_password / verify_password ─────────────────────────────────────────
 
+
 class TestPasswordHashing:
     def test_hash_is_not_plaintext(self):
         assert hash_password("secret") != "secret"
@@ -71,6 +72,7 @@ class TestPasswordHashing:
 
 
 # ─── JWT round-trip ───────────────────────────────────────────────────────────
+
 
 class TestJWTCreation:
     def test_access_token_has_type_access(self):
@@ -123,6 +125,7 @@ class TestJWTCreation:
 
 # ─── decode_token failure paths ───────────────────────────────────────────────
 
+
 class TestDecodeTokenFailures:
     def test_tampered_signature_raises_401(self):
         token = create_access_token({"user_id": "u1", "email": "a@b.com"})
@@ -170,6 +173,7 @@ class TestDecodeTokenFailures:
 
 
 # ─── revoke_token / is_token_revoked ─────────────────────────────────────────
+
 
 class TestTokenRevocation:
     # Note: the _reset_revoked_jtis autouse fixture (conftest.py) clears the

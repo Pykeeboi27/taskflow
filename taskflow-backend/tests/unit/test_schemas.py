@@ -16,6 +16,7 @@ from app.schemas import RegisterRequest, TaskCreate, TaskResponse, TaskUpdate
 
 # ─── RegisterRequest ──────────────────────────────────────────────────────────
 
+
 class TestRegisterRequest:
     def test_valid_request_is_accepted(self):
         obj = RegisterRequest(email="user@example.com", password="password123")
@@ -43,6 +44,7 @@ class TestRegisterRequest:
 
 
 # ─── TaskCreate ───────────────────────────────────────────────────────────────
+
 
 class TestTaskCreate:
     def test_valid_task_is_accepted(self):
@@ -103,6 +105,7 @@ class TestTaskCreate:
 
 # ─── TaskUpdate ───────────────────────────────────────────────────────────────
 
+
 class TestTaskUpdate:
     def test_empty_update_is_valid(self):
         obj = TaskUpdate()
@@ -147,6 +150,7 @@ class TestTaskUpdate:
 
 
 # ─── TaskResponse (ORM mode via from_attributes) ─────────────────────────────
+
 
 class TestTaskResponse:
     """

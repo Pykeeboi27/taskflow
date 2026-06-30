@@ -60,6 +60,7 @@ async def db_session(engine):
 
 # ─── HTTP client ──────────────────────────────────────────────────────────────
 
+
 @pytest.fixture
 async def client(db_session: AsyncSession):
     """
@@ -81,6 +82,7 @@ async def client(db_session: AsyncSession):
 
 
 # ─── User helpers ─────────────────────────────────────────────────────────────
+
 
 async def _make_user(
     db: AsyncSession,
@@ -125,6 +127,7 @@ async def authed_client(client: AsyncClient, test_user: User) -> AsyncClient:
 
 
 # ─── Global state resets (autouse) ──────────────────────────────────────────
+
 
 @pytest.fixture(autouse=True)
 def _reset_revoked_jtis():

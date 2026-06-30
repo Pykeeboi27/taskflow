@@ -2,9 +2,20 @@ import type { ReactNode } from "react";
 
 function LogoMark({ size = 48 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
       <rect width="24" height="24" rx="6" fill="rgba(255,255,255,0.15)" />
-      <path d="M7 8h10M7 12h6M7 16h8" stroke="white" strokeWidth="2" strokeLinecap="round" />
+      <path
+        d="M7 8h10M7 12h6M7 16h8"
+        stroke="white"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -28,9 +39,20 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-2 mb-8">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <svg
+              width="26"
+              height="26"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
               <rect width="24" height="24" rx="6" fill="var(--color-brand)" />
-              <path d="M7 8h10M7 12h6M7 16h8" stroke="white" strokeWidth="2" strokeLinecap="round" />
+              <path
+                d="M7 8h10M7 12h6M7 16h8"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
             </svg>
             <span className="text-sm font-semibold text-ink">TaskFlow</span>
           </div>

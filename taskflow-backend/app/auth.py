@@ -44,82 +44,84 @@ def is_token_revoked(jti: str) -> bool:
 
 
 def hash_password(password: str) -> str:
-	# Bcrypt has a 72-byte limit. Truncate to ensure compatibility.
-	return pwd_context.hash(password[:72])
+    # Bcrypt has a 72-byte limit. Truncate to ensure compatibility.
+    return pwd_context.hash(password[:72])
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-	# Truncate to match what was hashed.
-	return pwd_context.verify(plain[:72], hashed)
+    # Truncate to match what was hashed.
+    return pwd_context.verify(plain[:72], hashed)
 
 
 def _create_token(data: dict, expires_delta: timedelta, token_type: str) -> str:
-	payload = data.copy()
-	if "user_id" in payload and "sub" not in payload:
-		payload["sub"] = str(payload["user_id"])
-	payload["token_type"] = token_type
-	payload["jti"] = uuid4().hex  # unique token ID, used for revocation
-	expire = datetime.now(timezone.utc) + expires_delta
-	payload["exp"] = expire
-	return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    payload = data.copy()
+    if "user_id" in payload and "sub" not in payload:
+        payload["sub"] = str(payload["user_id"])
+    payload["token_type"] = token_type
+    payload["jti"] = uuid4().hex  # unique token ID, used for revocation
+    expire = datetime.now(timezone.utc) + expires_delta
+    payload["exp"] = expire
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
 def create_access_token(data: dict) -> str:
-	return _create_token(data, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES), "access")
+    return _create_token(data, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES), "access")
 
 
 def create_refresh_token(data: dict) -> str:
-	return _create_token(data, timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS), "refresh")
+    return _create_token(data, timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS), "refresh")
 
 
 def decode_token(token: str) -> dict:
-	try:
-		return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-	except JWTError as exc:
-		raise HTTPException(
-			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="Could not validate credentials",
-			headers={"WWW-Authenticate": "Bearer"},
-		) from exc
+    try:
+        return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    except JWTError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from exc
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: AsyncSession = Depends(get_db)) -> User:
-	payload = decode_token(token)
+async def get_current_user(
+    token: Annotated[str, Depends(oauth2_scheme)], db: AsyncSession = Depends(get_db)
+) -> User:
+    payload = decode_token(token)
 
-	jti = payload.get("jti")
-	if jti and is_token_revoked(str(jti)):
-		raise HTTPException(
-			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="Could not validate credentials",
-			headers={"WWW-Authenticate": "Bearer"},
-		)
+    jti = payload.get("jti")
+    if jti and is_token_revoked(str(jti)):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
-	user_id = payload.get("sub") or payload.get("user_id")
+    user_id = payload.get("sub") or payload.get("user_id")
 
-	if not user_id:
-		raise HTTPException(
-			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="Could not validate credentials",
-			headers={"WWW-Authenticate": "Bearer"},
-		)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
-	try:
-		user_uuid = UUID(str(user_id))
-	except (TypeError, ValueError) as exc:
-		raise HTTPException(
-			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="Could not validate credentials",
-			headers={"WWW-Authenticate": "Bearer"},
-		) from exc
+    try:
+        user_uuid = UUID(str(user_id))
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from exc
 
-	result = await db.execute(select(User).where(User.id == user_uuid))
-	user = result.scalar_one_or_none()
+    result = await db.execute(select(User).where(User.id == user_uuid))
+    user = result.scalar_one_or_none()
 
-	if user is None:
-		raise HTTPException(
-			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="Could not validate credentials",
-			headers={"WWW-Authenticate": "Bearer"},
-		)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
-	return user
+    return user
