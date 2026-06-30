@@ -1,0 +1,128 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ─── Stage 1: Secrets Detection ───────────────────────────────────────────────
+
+  gitleaks:
+    name: Secrets Scan (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ─── Stage 2: Security Scan ───────────────────────────────────────────────────
+
+  trivy:
+    name: Security Scan (Trivy)
+    needs: [gitleaks]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          exit-code: 1
+          scanners: vuln,misconfig
+          skip-dirs: taskflow-frontend/.next
+
+  # ─── Stage 3: Lint + Format + Test (parallel) ─────────────────────────────────
+
+  backend-ci:
+    name: Backend CI
+    needs: [trivy]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: taskflow-backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: |
+            taskflow-backend/requirements.txt
+            taskflow-backend/requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Install Ruff
+        run: pip install ruff==0.6.0
+
+      - name: Ruff lint
+        run: ruff check .
+
+      - name: Ruff format check
+        run: ruff format --check .
+
+      - name: Run tests
+        run: pytest --cov=app --cov-report=term --cov-fail-under=80
+
+  frontend-ci:
+    name: Frontend CI
+    needs: [trivy]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: taskflow-frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: taskflow-frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prettier format check
+        run: npx prettier --check "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}"
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test:run
+
+  # ─── Stage 4: Build ───────────────────────────────────────────────────────────
+
+  build:
+    name: Build
+    needs: [backend-ci, frontend-ci]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend Docker image
+        run: docker build -t taskflow-backend:${{ github.sha }} ./taskflow-backend
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: taskflow-frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: taskflow-frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: taskflow-frontend
