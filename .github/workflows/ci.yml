@@ -80,6 +80,9 @@ jobs:
       - name: Ruff format check
         run: ruff format --check .
 
+      - name: Install pytest-cov
+        run: pip install pytest-cov
+
       - name: Run tests
         run: pytest --cov=app --cov-report=term --cov-fail-under=80
 
