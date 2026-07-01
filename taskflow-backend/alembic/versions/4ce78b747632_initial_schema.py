@@ -3,12 +3,12 @@
 Revision ID: 4ce78b747632
 Revises:
 Create Date: 2026-06-30 09:31:50.964865
-
 """
+
 from typing import Sequence, Union
 
 # revision identifiers, used by Alembic.
-revision: str = '4ce78b747632'
+revision: str = "4ce78b747632"
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
